@@ -61,9 +61,10 @@ public class TankDrive extends LinearOpMode {
     private DcMotor rightDrive = null;
     private DcMotor flywheel = null;
     private DcMotor greatHopper = null;
-    private Servo parcelSpinner = null;
 
-    double parcelPosition = 0; //the servo's position
+    private Servo parcelSpinner;
+    public final static double parcelHome = 0;
+    double parcelPosition = parcelHome; //the servo's position
 
     @Override
     public void runOpMode() {
@@ -79,6 +80,7 @@ public class TankDrive extends LinearOpMode {
         greatHopper = hardwareMap.get(DcMotor.class, "great_hopper");
         //parcelSpinner = hardwareMap.get(Servo.class, "parcel_spinner");
         parcelSpinner = hardwareMap.get(Servo.class, "parcel_spinner");
+        //parcelSpinner.setPosition(parcelPosition);
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -95,6 +97,9 @@ public class TankDrive extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
+            telemetry.update();
+            //rotate_servo();
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
@@ -114,16 +119,22 @@ public class TankDrive extends LinearOpMode {
 
             if (gamepad1.y) {
                 flyPower = 1;
-                hopperPower = 1;
                 //parcelPosition += 1; //increase servo position
                 //parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
                 //parcelPower = 1;
             }
-            if (gamepad1.x) {
-                parcelPosition += 0.005; //increase servo position
-                parcelSpinner.setPosition(1); //tell servo to move to that position
+            if (gamepad1.b) {
+                // move to 180 degrees.
+                hopperPower = 1;
             }
 
+            if(gamepad1.x) {
+                // move to 0 degrees.
+                parcelSpinner.setPosition(0);
+            } else if (gamepad1.a) {
+                // move to 90 degrees.
+                parcelSpinner.setPosition(1);
+            }
 
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
@@ -146,8 +157,16 @@ public class TankDrive extends LinearOpMode {
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.addData("Lord Angel who doth flyuth", "%.2f", flyPower);
             telemetry.addData("Great Hopper because no one can stop us putting Hollow Knight references", "%.2f", hopperPower);
-            telemetry.addData("Corrupt Lord Parcel Spinner", "%.2f", parcelPosition);
+            //telemetry.addData("Corrupt Lord Parcel Spinner go 2", "%.2f", parcelPosition);
+            telemetry.addData("Corrupt Lord Parcel Spinner go 2 Pos", parcelSpinner.getPosition());
             telemetry.update();
         }
     }
+    /* 
+    private void rotate_servo() {
+        while (gamepad1.x) {
+                parcelPosition += 0.005; //increase servo position
+                parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
+            }
+    } */
 }
