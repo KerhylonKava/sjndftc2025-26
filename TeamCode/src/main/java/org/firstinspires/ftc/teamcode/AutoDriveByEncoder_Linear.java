@@ -35,6 +35,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Servo;
+
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -62,7 +65,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Robot: Auto Drive By Encoder", group="Robot")
-@Disabled
+//@Disabled
 public class AutoDriveByEncoder_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -104,8 +107,10 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        greatHopper.setDirection(DcMotor.Direction.REVERSE);
 
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -118,11 +123,11 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
         telemetry.addData("Starting at",  "%7d :%7d",
                           leftDrive.getCurrentPosition(),
                           rightDrive.getCurrentPosition());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.addData("Lord Angel who doth flyuth", "%.2f", flyPower);
-            telemetry.addData("Great Hopper because no one can stop us putting Hollow Knight references", "%.2f", hopperPower);
+            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            //telemetry.addData("Lord Angel who doth flyuth", "%.2f", flyPower);
+            //telemetry.addData("Great Hopper because no one can stop us putting Hollow Knight references", "%.2f", hopperPower);
             //telemetry.addData("Corrupt Lord Parcel Spinner go 2", "%.2f", parcelPosition);
-            telemetry.addData("Corrupt Lord Parcel Spinner go 2 Pos", parcelSpinner.getPosition());
+            //telemetry.addData("Corrupt Lord Parcel Spinner go 2 Pos", parcelSpinner.getPosition());
         telemetry.update();
 
         // Wait for the game to start (driver presses START)
@@ -130,9 +135,19 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  48,  48, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderDrive(TURN_SPEED,   12, -12, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED,  20,  20, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(TURN_SPEED,   -1.5, 1.5, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        encoderDrive(DRIVE_SPEED, 7, 6, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        //encoderDrive(TURN_SPEED,   -6, 6, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+        launch(0.8,
+                            0.5,
+                             4.0);
+        launch(0.8,
+                            0.5,
+                             4.0);
+        launch(0.8,
+                            0.5,
+                             4.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -195,6 +210,63 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move.
+        }
+    }
+
+    public void launch(double flySpeed,
+                            double hopperTime,
+                             double timeoutS) {
+        //int newLeftTarget;
+        //int newRightTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            //newLeftTarget = leftDrive.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            //newRightTarget = rightDrive.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            //leftDrive.setTargetPosition(newLeftTarget);
+            //rightDrive.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            //flywheel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //greatHopper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            flywheel.setPower(Math.abs(flySpeed));
+            sleep(1000);
+            greatHopper.setPower(1);
+            sleep(500);
+            greatHopper.setPower(0);
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                   (runtime.seconds() < timeoutS) &&
+                   (leftDrive.isBusy() && rightDrive.isBusy())) {
+
+                // Display it for the driver.
+                //telemetry.addData("Running to",  " %7d :%7d", newLeftTarget,  newRightTarget);
+                telemetry.addData("Currently at",  " at %7d :%7d",
+                                            //flywheel.speed(),
+                                            greatHopper.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            flywheel.setPower(0);
+            greatHopper.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            //leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             sleep(250);   // optional pause after each move.
         }
