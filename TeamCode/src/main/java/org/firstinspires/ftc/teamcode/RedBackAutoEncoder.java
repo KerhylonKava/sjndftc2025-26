@@ -64,9 +64,9 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Robot: Auto Drive By Encoder", group="Robot")
+@Autonomous(name="Red Back Auto Drive By Encoder", group="Robot")
 //@Disabled
-public class AutoDriveByEncoder_Linear extends LinearOpMode {
+public class RedBackAutoEncoder extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor leftDrive = null;
@@ -91,8 +91,8 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     TURN_SPEED              = 0.5;
+    static final double     DRIVE_SPEED             = 0.5;
+    static final double     TURN_SPEED              = 0.4;
 
     @Override
     public void runOpMode() {
@@ -139,13 +139,7 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
         encoderDrive(TURN_SPEED,   -1.5, 1.5, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         encoderDrive(DRIVE_SPEED, 7, 6, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
         //encoderDrive(TURN_SPEED,   -6, 6, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        launch(0.8,
-                            0.5,
-                             4.0);
-        launch(0.8,
-                            0.5,
-                             4.0);
-        launch(0.8,
+        launch(0.75,
                             0.5,
                              4.0);
 
@@ -237,10 +231,22 @@ public class AutoDriveByEncoder_Linear extends LinearOpMode {
             // reset the timeout time and start motion.
             runtime.reset();
             flywheel.setPower(Math.abs(flySpeed));
-            sleep(1000);
+            sleep(2000);
             greatHopper.setPower(1);
             sleep(500);
             greatHopper.setPower(0);
+            //launch 1
+            sleep(2000);
+            greatHopper.setPower(1);
+            sleep(500);
+            greatHopper.setPower(0);
+            //launch 2
+            sleep(2000);
+            greatHopper.setPower(1);
+            sleep(500);
+            greatHopper.setPower(0);
+            //launch 3
+
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits

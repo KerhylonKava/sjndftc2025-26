@@ -90,6 +90,7 @@ public class TankDrive extends LinearOpMode {
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         greatHopper.setDirection(DcMotor.Direction.REVERSE);
 
+        double flyPowerVar = 0.8;
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -106,7 +107,7 @@ public class TankDrive extends LinearOpMode {
             double rightPower;
             double flyPower = 0;
             double hopperPower = 0;
-            double flyPowerVar = 0.8;
+            
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -119,7 +120,7 @@ public class TankDrive extends LinearOpMode {
             //double hopperPower = 0;
 
             if (gamepad1.y) {
-                flyPower = flyPowerVar;
+                flyPower = 0.775;
                 //parcelPosition += 1; //increase servo position
                 //parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
                 //parcelPower = 1;
@@ -128,17 +129,17 @@ public class TankDrive extends LinearOpMode {
                 // move to 180 degrees.
                 hopperPower = 1;
             }
-            if(gamepad1.dpad_up) {
-                flyPowerVar += 0.025;
+            if(gamepad1.dpad_up && flyPowerVar<1) {
+                flyPowerVar += 0.0025;
             }
-            if(gamepad1.dpad_down) {
-                flyPowerVar -= 0.025;
+            if(gamepad1.dpad_down && flyPowerVar>0) {
+                flyPowerVar -= 0.0025;
             }
 
             if(gamepad1.x) {
                 // move to 0 degrees.
                 //parcelSpinner.setPosition(0);
-                flyPower = 0.8;
+                flyPower = 0.7;
             } else if (gamepad1.a) {
                 // move to 90 degrees.
                 parcelSpinner.setPosition(1);
