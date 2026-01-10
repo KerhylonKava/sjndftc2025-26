@@ -138,9 +138,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,  -21,  -20, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
         
         //launches 3 times
-        launch(0.75,
-                            0.5,
-                             4.0);
+        launch(0.75, 0.5, 4.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();

@@ -66,6 +66,8 @@ public class TankDrive extends LinearOpMode {
     public final static double parcelHome = 0;
     double parcelPosition = parcelHome; //the servo's position
 
+    double flyPowerVar = 0.8;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -90,7 +92,6 @@ public class TankDrive extends LinearOpMode {
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         greatHopper.setDirection(DcMotor.Direction.REVERSE);
 
-        double flyPowerVar = 0.8;
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -120,7 +121,7 @@ public class TankDrive extends LinearOpMode {
             //double hopperPower = 0;
 
             if (gamepad1.y) {
-                flyPower = 0.775;
+                flyPower = flyPowerVar;
                 //parcelPosition += 1; //increase servo position
                 //parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
                 //parcelPower = 1;
@@ -139,10 +140,11 @@ public class TankDrive extends LinearOpMode {
             if(gamepad1.x) {
                 // move to 0 degrees.
                 //parcelSpinner.setPosition(0);
-                flyPower = 0.7;
-            } else if (gamepad1.a) {
-                // move to 90 degrees.
-                parcelSpinner.setPosition(1);
+                flyPower = 0.75;
+            } 
+            if (gamepad1.a) { //well it does go backwards, but... it does not un-jam
+                flyPower = -0.775;
+                hopperPower = -1;
             }
 
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
