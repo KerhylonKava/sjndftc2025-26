@@ -91,7 +91,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.3;
+    static final double     DRIVE_SPEED             = 0.2;
     static final double     TURN_SPEED              = 0.4;
 
     @Override
@@ -138,7 +138,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,  -21,  -20, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
         
         //launches 3 times
-        launch(0.75, 0.5, 4.0);
+        launch(0.74, 0.45, 4.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -229,19 +229,19 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
             // reset the timeout time and start motion.
             runtime.reset();
             flywheel.setPower(Math.abs(flySpeed));
-            sleep(2500);
+            sleep(2700);
             greatHopper.setPower(1);
-            sleep(450);
+            sleep(400);
             greatHopper.setPower(0);
             //launch 1
             sleep(2500);
             greatHopper.setPower(1);
-            sleep(450);
+            sleep(400);
             greatHopper.setPower(0);
             //launch 2
             sleep(2500);
             greatHopper.setPower(1);
-            sleep(450);
+            sleep(400);
             greatHopper.setPower(0);
             //launch 3
 

@@ -66,7 +66,7 @@ public class TankDrive extends LinearOpMode {
     public final static double parcelHome = 0;
     double parcelPosition = parcelHome; //the servo's position
 
-    double flyPowerVar = 0.8;
+    double flyPowerVar = 0.69;
 
     @Override
     public void runOpMode() {
@@ -140,10 +140,10 @@ public class TankDrive extends LinearOpMode {
             if(gamepad1.x) {
                 // move to 0 degrees.
                 //parcelSpinner.setPosition(0);
-                flyPower = 0.75;
+                hopperPower = -1;
             } 
             if (gamepad1.a) { //well it does go backwards, but... it does not un-jam
-                flyPower = -0.775;
+                flyPower = -1;
                 hopperPower = -1;
             }
 
