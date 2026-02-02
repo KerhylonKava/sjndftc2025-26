@@ -73,6 +73,8 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
     private DcMotor rightDrive = null;
     private DcMotor flywheel = null;
     private DcMotor greatHopper = null;
+    private DcMotor intake = null;
+
 
     private Servo parcelSpinner;
     public final static double parcelHome = 0;
@@ -93,6 +95,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.2;
     static final double     TURN_SPEED              = 0.4;
+    static final double     FLY_SPEED               = 0.59;
 
     @Override
     public void runOpMode() {
@@ -103,6 +106,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         greatHopper = hardwareMap.get(DcMotor.class, "great_hopper");
         parcelSpinner = hardwareMap.get(Servo.class, "parcel_spinner");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -111,6 +115,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         greatHopper.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.FORWARD);
 
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -135,10 +140,10 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  -21,  -20, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        //encoderDrive(DRIVE_SPEED,  -21,  -20, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
         
         //launches 3 times
-        launch(0.74, 0.45, 4.0);
+        launch(FLY_SPEED, 1000, 4.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -208,7 +213,7 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
     }
 
     public void launch(double flySpeed,
-                            double hopperTime,
+                            double intakeTime,
                              double timeoutS) {
         //int newLeftTarget;
         //int newRightTarget;
@@ -228,21 +233,20 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
+            //parcelSpinner.setPosition(90);
+            rotate_servo(); // sets servo in place
             flywheel.setPower(Math.abs(flySpeed));
-            sleep(2700);
-            greatHopper.setPower(1);
-            sleep(400);
-            greatHopper.setPower(0);
+            sleep(5000);
+            rotate_servo(); // first launch
             //launch 1
-            sleep(2500);
-            greatHopper.setPower(1);
-            sleep(400);
-            greatHopper.setPower(0);
+            sleep(2000);
+            rotate_servo(); //second launch
             //launch 2
-            sleep(2500);
-            greatHopper.setPower(1);
-            sleep(400);
-            greatHopper.setPower(0);
+            sleep(2000);
+            intake.setPower(1);
+            sleep(1000);
+            intake.setPower(0);
+            rotate_servo();
             //launch 3
 
 
@@ -258,15 +262,14 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
 
                 // Display it for the driver.
                 //telemetry.addData("Running to",  " %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Currently at",  " at %7d :%7d",
-                                            //flywheel.speed(),
-                                            greatHopper.getCurrentPosition());
+                //telemetry.addData("Currently at",  " at %7d :%7d",flywheel.speed());
+                                            //greatHopper.getCurrentPosition());
                 telemetry.update();
             }
 
             // Stop all motion;
             flywheel.setPower(0);
-            greatHopper.setPower(0);
+            //greatHopper.setPower(0);
 
             // Turn off RUN_TO_POSITION
             //leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -274,5 +277,12 @@ public class RedBlueFrontAutoEncoder extends LinearOpMode {
 
             sleep(250);   // optional pause after each move.
         }
+    }
+    private void rotate_servo() {
+                parcelPosition += 80; //increase servo position
+                parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
+                sleep(1000);
+                parcelPosition -= 80; //increase servo position
+                parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
     }
 }

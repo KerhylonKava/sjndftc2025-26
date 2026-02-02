@@ -61,12 +61,13 @@ public class TankDrive extends LinearOpMode {
     private DcMotor rightDrive = null;
     private DcMotor flywheel = null;
     private DcMotor greatHopper = null;
+    private DcMotor intake = null;
 
     private Servo parcelSpinner;
     public final static double parcelHome = 0;
     double parcelPosition = parcelHome; //the servo's position
 
-    double flyPowerVar = 0.69;
+    double flyPowerVar = 0.59;
 
     @Override
     public void runOpMode() {
@@ -80,6 +81,7 @@ public class TankDrive extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         greatHopper = hardwareMap.get(DcMotor.class, "great_hopper");
+        intake = hardwareMap.get(DcMotor.class, "intake");
         //parcelSpinner = hardwareMap.get(Servo.class, "parcel_spinner");
         parcelSpinner = hardwareMap.get(Servo.class, "parcel_spinner");
         //parcelSpinner.setPosition(parcelPosition);
@@ -91,6 +93,7 @@ public class TankDrive extends LinearOpMode {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         flywheel.setDirection(DcMotor.Direction.REVERSE);
         greatHopper.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.FORWARD);
 
 
         // Wait for the game to start (driver presses START)
@@ -101,13 +104,14 @@ public class TankDrive extends LinearOpMode {
         while (opModeIsActive()) {
 
             telemetry.update();
-            //rotate_servo();
+            rotate_servo();
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
-            double flyPower = 0;
+            double flyPower = flyPowerVar;
             double hopperPower = 0;
+            double intakePower = 0;
             
 
             // Choose to drive using either Tank Mode, or POV Mode
@@ -120,31 +124,35 @@ public class TankDrive extends LinearOpMode {
             //double flyPower = 0;
             //double hopperPower = 0;
 
-            if (gamepad1.y) {
-                flyPower = flyPowerVar;
+            if (gamepad1.right_trigger > 0.1) {
+                flyPower = 0;
                 //parcelPosition += 1; //increase servo position
                 //parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
                 //parcelPower = 1;
             }
-            if (gamepad1.b) {
-                // move to 180 degrees.
-                hopperPower = 1;
-            }
-            if(gamepad1.dpad_up && flyPowerVar<1) {
-                flyPowerVar += 0.0025;
-            }
-            if(gamepad1.dpad_down && flyPowerVar>0) {
-                flyPowerVar -= 0.0025;
+            if (gamepad1.right_bumper) {
+                flyPower = -(flyPowerVar/2);
             }
 
+            if (gamepad1.left_trigger > 0.1) {
+                // move to 180 degrees.
+                //hopperPower = 1;
+                intakePower = 1;
+            }
+            else if (gamepad1.left_bumper) {
+                intakePower = -0.5;
+            }
+            
+            
             if(gamepad1.x) {
                 // move to 0 degrees.
                 //parcelSpinner.setPosition(0);
-                hopperPower = -1;
+                //hopperPower = -1;
             } 
+                
             if (gamepad1.a) { //well it does go backwards, but... it does not un-jam
-                flyPower = -1;
-                hopperPower = -1;
+                //flyPower = -1;
+                //hopperPower = -1;
             }
 
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -161,6 +169,8 @@ public class TankDrive extends LinearOpMode {
             rightDrive.setPower(rightPower);
             flywheel.setPower(flyPower);
             greatHopper.setPower(hopperPower);
+            intake.setPower(intakePower);
+            
             //parcelSpinner.setPower(parcelPower);
 
             // Show the elapsed game time and wheel power.
@@ -169,16 +179,21 @@ public class TankDrive extends LinearOpMode {
             telemetry.addData("Lord Angel who doth flyuth", "%.2f", flyPower);
             telemetry.addData("Lord Angel's current reigning power", flyPowerVar);
             telemetry.addData("Great Hopper because no one can stop us putting Hollow Knight references", "%.2f", hopperPower);
+            telemetry.addData("le intake", "%.2f", intakePower);
             //telemetry.addData("Corrupt Lord Parcel Spinner go 2", "%.2f", parcelPosition);
             telemetry.addData("Corrupt Lord Parcel Spinner go 2 Pos", parcelSpinner.getPosition());
             telemetry.update();
         }
     }
-    /* 
+
     private void rotate_servo() {
-        while (gamepad1.x) {
+        while (gamepad1.dpad_up) {
                 parcelPosition += 0.005; //increase servo position
                 parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
             }
-    } */
+        while (gamepad1.dpad_down) {
+            parcelPosition -= 0.005; //increase servo position
+                parcelSpinner.setPosition(parcelPosition); //tell servo to move to that position
+        }
+    }
 }
